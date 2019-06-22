@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import com.dgimatov.foursqplacesdemo.R
+import com.dgimatov.foursqplacesdemo.model.FoursquareApiRepoImpl
 import com.dgimatov.foursqplacesdemo.model.UserLocationRepo
 import com.dgimatov.foursqplacesdemo.model.UserLocationRepoImpl
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -30,6 +31,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var userLocationRepo: UserLocationRepo
 
     private val compositeDisposable = CompositeDisposable()
+
+    private val foursquareApiRepo = FoursquareApiRepoImpl()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,9 +69,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun animateToCurrentLocation(latLng: LatLng) {
         val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
         map.animateCamera(cameraUpdate)
+        map.clear()
         map.addMarker(
             MarkerOptions()
                 .position(latLng)
+                .title("You're here")
         )
     }
 
