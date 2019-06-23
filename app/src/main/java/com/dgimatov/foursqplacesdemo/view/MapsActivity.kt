@@ -9,12 +9,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import com.dgimatov.foursqplacesdemo.R
 import com.dgimatov.foursqplacesdemo.di.DependencyResolver
+import com.dgimatov.foursqplacesdemo.model.CameraBounds
 import com.dgimatov.foursqplacesdemo.model.UserLocationRepo
 import com.dgimatov.foursqplacesdemo.model.Venue
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 
 /**
@@ -101,7 +103,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
             if (grantResults[0] == PERMISSION_GRANTED) {
                 mapPresenter.permissionChanged()
             } else if (ActivityCompat.shouldShowRequestPermissionRationale(this, ACCESS_FINE_LOCATION)) {
-                //TODO bad choice
+
             }
         }
     }
@@ -135,5 +137,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
             true
         }
         mapPresenter.mapIsReady()
+        map.setOnCameraIdleListener {
+            Log.i("test_", "map is idle")
+            mapPresenter.mapIsIdle(map.projection.visibleRegion.latLngBounds.toCameraBounds())
+        }
     }
+
+    private fun LatLngBounds.toCameraBounds(): CameraBounds {
+        val northeast = com.dgimatov.foursqplacesdemo.model.LatLng(this.northeast.latitude,
+                this.northeast.longitude)
+        val southwest = com.dgimatov.foursqplacesdemo.model.LatLng(this.southwest.latitude,
+                this.southwest.longitude)
+        return CameraBounds(southwest = southwest, northeast = northeast)
+    }
+
 }

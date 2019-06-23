@@ -30,16 +30,13 @@ class FoursquareApiRepoImpl : FoursquareApiRepo {
             .create(FoursquareApi::class.java)
 
     init {
-        logging.level = HttpLoggingInterceptor.Level.NONE
+        logging.level = HttpLoggingInterceptor.Level.BASIC
     }
 
-    override fun getRestaurantsForLocation(
-            latLng: LatLng,
-            clientId: String,
-            clientSecret: String
-    ): Observable<FoursquareSearchApiResponse> {
-        return foursquareApi.getRestaurantsForLocation(
-                coordinates = "${latLng.lat},${latLng.lng}",
+    override fun getRestaurantsForBounds(northeast: LatLng, southwest: LatLng, clientId: String, clientSecret: String): Observable<FoursquareSearchApiResponse> {
+        return foursquareApi.getRestaurantsForBounds(
+                northeast = "${northeast.lat},${northeast.lng}",
+                southwest = "${southwest.lat},${southwest.lng}",
                 client_id = clientId,
                 client_secret = clientSecret)
     }
