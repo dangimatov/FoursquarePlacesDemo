@@ -6,10 +6,12 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDialog
 import com.dgimatov.foursqplacesdemo.R
 import kotlinx.android.synthetic.main.detail_panel.*
+import retrofit2.HttpException
 
 /**
  * Panel which shows details of a restaurant
@@ -43,15 +45,35 @@ class DetailPanel(context: Context) : AppCompatDialog(context), DetailView {
             }
 
             is DetailViewContentState.ShowDetails -> {
-                detailPanelName.text = state.venueDetails.name
-                detailPanelDescription.text = state.venueDetails.description
+                detailPanelName.setTextOrHide(state.venueDetails.name)
+                detailPanelDescription.setTextOrHide(state.venueDetails.description)
+                var address = ""
+                state.venueDetails.location.formattedAddress?.forEach {
+                    address += it
+                    address += "\n"
+                }
+                detailPanelAddress.setTextOrHide(address)
                 detailsContainer.visibility = View.VISIBLE
                 detailsProgress.visibility = View.GONE
             }
 
             is DetailViewContentState.Error -> {
-                showErrorDialog(state.exception)
-                dismiss()
+                if (state.exception is HttpException && state.exception.code() == 429) {
+                    detailPanelName.setTextOrHide(state.venue.name)
+                    var address = ""
+                    state.venue.location.formattedAddress?.forEach {
+                        address += it
+                        address += "\n"
+                    }
+                    detailPanelAddress.setTextOrHide(address)
+                    detailPanelDescription.setTextOrHide("Unfortunately API's daily quota was exceeded. Only basic information is available")
+                    detailsContainer.visibility = View.VISIBLE
+                    detailsProgress.visibility = View.GONE
+                } else {
+                    showErrorDialog(state.exception)
+                    dismiss()
+                }
+
             }
         }
     }
@@ -65,5 +87,19 @@ class DetailPanel(context: Context) : AppCompatDialog(context), DetailView {
                     dialog.dismiss()
                 }
                 .show()
+    }
+
+    private fun TextView.setTextOrHide(text: String?) {
+        text?.let {
+            if (text != "") {
+                this.text = it
+                this.visibility = View.VISIBLE
+            } else {
+                this.visibility = View.GONE
+            }
+
+        } ?: run {
+            this.visibility = View.GONE
+        }
     }
 }

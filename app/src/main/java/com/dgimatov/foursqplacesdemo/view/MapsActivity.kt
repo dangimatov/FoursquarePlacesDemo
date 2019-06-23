@@ -26,7 +26,6 @@ import kotlinx.android.synthetic.main.activity_maps.*
  */
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
 
-
     private lateinit var map: GoogleMap
 
     private lateinit var mapPresenter: MapPresenter
@@ -48,7 +47,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
     override fun onStart() {
         super.onStart()
         mapPresenter.onStart(
-            mapView = this
+                mapView = this
         )
     }
 
@@ -76,23 +75,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
         zoomInMoreText.visibility = View.GONE
         restaurants.forEach {
             val marker = map.addMarker(
-                MarkerOptions()
-                    .position(LatLng(it.location.lat, it.location.lng))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                    .title(it.name)
+                    MarkerOptions()
+                            .position(LatLng(it.location.lat, it.location.lng))
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                            .title(it.name)
             )
-            marker.tag = it.id
+            marker.tag = it
         }
     }
 
     private fun showErrorDialog(e: Throwable) {
         zoomInMoreText.visibility = View.GONE
         AlertDialog.Builder(this)
-            .setTitle("Error")
-            .setCancelable(true)
-            .setMessage("Something went wrong: ${e.message}")
-            .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
-            .show()
+                .setTitle("Error")
+                .setCancelable(true)
+                .setMessage("Something went wrong: ${e.message}")
+                .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
+                .show()
     }
 
     private fun animateToCurrentLocation(latLng: LatLng) {
@@ -101,9 +100,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
         map.animateCamera(cameraUpdate)
         map.clear()
         map.addMarker(
-            MarkerOptions()
-                .position(latLng)
-                .title("You're here")
+                MarkerOptions()
+                        .position(latLng)
+                        .title("You're here")
         )
     }
 
@@ -120,20 +119,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
 
     private fun setupMap() {
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+                .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
-    private fun showDetailPanel(id: String) {
+    private fun showDetailPanel(restaurant: Venue) {
         detailPanel?.let {
             it.updateState(DetailViewContentState.Loading)
             if (!it.isShowing) {
                 it.show()
             }
-            detailPresenter.newRestaurantClicked(it, id)
+            detailPresenter.newRestaurantClicked(it, restaurant)
         } ?: run {
             detailPanel = DetailPanel(this)
-            showDetailPanel(id)
+            showDetailPanel(restaurant)
         }
 
         detailPanel?.setOnDismissListener { }
@@ -142,8 +141,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.setOnMarkerClickListener {
-            Log.i("test_", "marker clicked with id: " + it.tag as String?)
-            showDetailPanel(it.tag as String)
+            val venue = it.tag as Venue
+            Log.i("test_", "marker clicked with id: " + venue.id as String?)
+            showDetailPanel(venue)
             true
         }
         mapPresenter.mapIsReady()
@@ -155,12 +155,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
 
     private fun LatLngBounds.toCameraBounds(): CameraBounds {
         val northeast = com.dgimatov.foursqplacesdemo.model.LatLng(
-            this.northeast.latitude,
-            this.northeast.longitude
+                this.northeast.latitude,
+                this.northeast.longitude
         )
         val southwest = com.dgimatov.foursqplacesdemo.model.LatLng(
-            this.southwest.latitude,
-            this.southwest.longitude
+                this.southwest.latitude,
+                this.southwest.longitude
         )
         return CameraBounds(southwest = southwest, northeast = northeast)
     }

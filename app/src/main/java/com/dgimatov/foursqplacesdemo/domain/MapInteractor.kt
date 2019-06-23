@@ -19,11 +19,11 @@ import io.reactivex.subjects.PublishSubject
  * by any moment. Contains all the business logic to manage map screen
  */
 class MapInteractor(
-    private val userLocationRepo: UserLocationRepo,
-    private val foursquareApiRepo: FoursquareApiRepo,
-    private val foursquareClientId: String,
-    private val foursquareClientSecret: String,
-    private val scheduler: Scheduler
+        private val userLocationRepo: UserLocationRepo,
+        private val foursquareApiRepo: FoursquareApiRepo,
+        private val foursquareClientId: String,
+        private val foursquareClientSecret: String,
+        private val scheduler: Scheduler
 ) : MapPresenter {
 
     private val mapIsReadySubject = BehaviorSubject.create<Unit>()
@@ -40,37 +40,41 @@ class MapInteractor(
 
     private fun state(): Observable<MapState> {
         return merge(
-            Observable.combineLatest(
-                mapIsReadySubject,
-                mapIsIdleSubject
-                    .filter { currentMarkerBounds?.notContainBounds(it.cameraBounds) ?: true },
-                BiFunction<Unit, CameraBoundsAndZoom, CameraBoundsAndZoom> { _, boundsAndZoom -> boundsAndZoom })
-                .switchMap { boundsAndZoom ->
-                    if (boundsAndZoom.zoom >= ZOOM_LEVEL_THRESHOLD) {
-                        val expandedBounds = boundsAndZoom.cameraBounds.addBufferZone()
-                        foursquareApiRepo.getRestaurantsForBounds(
-                            bounds = expandedBounds,
-                            clientId = foursquareClientId,
-                            clientSecret = foursquareClientSecret
-                        )
-                            .map { it.response.venues }
-                            .map {
-                                currentMarkerBounds = expandedBounds
-                                MapState.AddRestaurants(it) as MapState
+                Observable.combineLatest(
+                        mapIsReadySubject,
+                        mapIsIdleSubject
+                                .filter {
+                                    currentMarkerBounds?.notContainBounds(it.cameraBounds) ?: true
+                                },
+                        BiFunction<Unit, CameraBoundsAndZoom, CameraBoundsAndZoom> { _, boundsAndZoom -> boundsAndZoom })
+                        .switchMap { boundsAndZoom ->
+                            if (boundsAndZoom.zoom >= ZOOM_LEVEL_THRESHOLD) {
+                                val expandedBounds = boundsAndZoom.cameraBounds.addBufferZone()
+                                foursquareApiRepo.getRestaurantsForBounds(
+                                        bounds = expandedBounds,
+                                        clientId = foursquareClientId,
+                                        clientSecret = foursquareClientSecret
+                                )
+                                        .map { it.response.venues }
+                                        .map {
+                                            currentMarkerBounds = expandedBounds
+                                            MapState.AddRestaurants(it) as MapState
+                                        }
+                            } else {
+                                currentMarkerBounds = null
+                                just(MapState.ZoomInMore)
                             }
-                    } else {
-                        just(MapState.ZoomInMore)
-                    }
-                },
-            animateToCurrentLocation()
+                        },
+                animateToCurrentLocation()
         )
-            .onErrorReturn { MapState.Error(it) }
+                .doOnDispose { currentMarkerBounds = null }
+                .onErrorReturn { MapState.Error(it) }
     }
 
     private fun animateToCurrentLocation(): Observable<MapState> {
         return mapIsReadySubject
-            .switchMap { userLocationRepo.userLocation() }
-            .map { MapState.AnimateToLocation(it) }
+                .switchMap { userLocationRepo.userLocation() }
+                .map { MapState.AnimateToLocation(it) }
     }
 
     override fun mapIsIdle(cameraBounds: CameraBounds, zoom: Float) {
@@ -81,12 +85,12 @@ class MapInteractor(
         view = mapView
 
         compositeDisposable.add(
-            state()
-                .observeOn(scheduler)
-                .subscribe(
-                    { view.updateState(it) },
-                    { Log.i("test_", "error happened in state subscription: $it") }
-                )
+                state()
+                        .observeOn(scheduler)
+                        .subscribe(
+                                { view.updateState(it) },
+                                { Log.i("test_", "error happened in state subscription: $it") }
+                        )
         )
     }
 

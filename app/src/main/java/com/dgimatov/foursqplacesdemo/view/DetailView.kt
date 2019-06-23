@@ -1,5 +1,6 @@
 package com.dgimatov.foursqplacesdemo.view
 
+import com.dgimatov.foursqplacesdemo.model.Venue
 import com.dgimatov.foursqplacesdemo.model.VenueDetails
 
 /**
@@ -27,6 +28,6 @@ sealed class DetailViewContentState {
     /**
      * Error happened
      */
-    data class Error(val exception: Throwable) : DetailViewContentState()
+    data class Error(val exception: Throwable, val venue: Venue) : DetailViewContentState()
 
 }

@@ -1,5 +1,7 @@
 package com.dgimatov.foursqplacesdemo.view
 
+import com.dgimatov.foursqplacesdemo.model.Venue
+
 /**
  * Presenter for [DetailView]
  */
@@ -11,7 +13,7 @@ interface DetailPanelContentPresenter {
     fun onStop()
 
     /**
-     * New restaurant marker was clocked
+     * New restaurant marker was clicked
      */
-    fun newRestaurantClicked(view: DetailView, id: String)
+    fun newRestaurantClicked(view: DetailView, restaurant: Venue)
 }
