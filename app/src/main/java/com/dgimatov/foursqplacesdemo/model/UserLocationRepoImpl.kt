@@ -13,7 +13,7 @@ import io.reactivex.subjects.PublishSubject
 /**
  * Implementation of [UserLocationRepo]
  */
-class UserLocationRepoImpl(
+open class UserLocationRepoImpl(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
     private val activity: Activity
 ) : UserLocationRepo {

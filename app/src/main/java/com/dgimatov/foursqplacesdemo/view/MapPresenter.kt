@@ -15,7 +15,7 @@ interface MapPresenter {
     /**
      * Tells our business logic that map is idle after move
      */
-    fun mapIsIdle(cameraBounds: CameraBounds)
+    fun mapIsIdle(cameraBounds: CameraBounds, zoom: Float)
 
     /**
      * Tells our business logic that map is ready by framework

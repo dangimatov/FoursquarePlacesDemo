@@ -9,16 +9,14 @@ interface FoursquareApiRepo {
 
     /**
      * Gives a list of restaurants close to given latlng bounds
-     * @param northeast northeast
-     * @param southwest southwest
+     * @param bounds cameraBounds
      * @param client_id foursquare's client_id
      * @param client_secret foursquare's client_secret
      */
     fun getRestaurantsForBounds(
-            northeast: LatLng,
-            southwest: LatLng,
-            clientId: String,
-            clientSecret: String
+        bounds: CameraBounds,
+        clientId: String,
+        clientSecret: String
     ): Observable<FoursquareSearchApiResponse>
 
     /**
@@ -28,8 +26,8 @@ interface FoursquareApiRepo {
      * @param client_secret foursquare's client_secret
      */
     fun getRestaurantDetailInfo(
-            id: String,
-            clientId: String,
-            clientSecret: String
+        id: String,
+        clientId: String,
+        clientSecret: String
     ): Observable<FoursquareVenueDetailApiResponse>
 }

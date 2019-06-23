@@ -35,12 +35,14 @@ data class CameraBounds(val southwest: LatLng, val northeast: LatLng) {
         val latDistance = (northeast.lat - southwest.lat) / 2
         val longDistance = (northeast.lng - southwest.lng) / 2
 
-        val expandedSouthwest = LatLng(southwest.lat - latDistance, southwest.lng - longDistance)
-        val expandedNortheast = LatLng(northeast.lat + latDistance, northeast.lng + longDistance)
+        val expandedSouthwest =
+            LatLng(Math.max(-90.0, southwest.lat - latDistance), Math.max(-180.0, southwest.lng - longDistance))
+        val expandedNortheast =
+            LatLng(Math.min(90.0, northeast.lat + latDistance), Math.min(180.0, northeast.lng + longDistance))
 
         return CameraBounds(
-                expandedSouthwest,
-                expandedNortheast
+            expandedSouthwest,
+            expandedNortheast
         )
     }
 }

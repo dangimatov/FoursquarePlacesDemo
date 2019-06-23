@@ -4,6 +4,7 @@ import android.Manifest.permission.ACCESS_FINE_LOCATION
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.main.activity_maps.*
 
 /**
  * Main activity which shows a map with restaurants on it
@@ -46,7 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
     override fun onStart() {
         super.onStart()
         mapPresenter.onStart(
-                mapView = this
+            mapView = this
         )
     }
 
@@ -62,38 +64,46 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
             is MapState.AnimateToLocation -> animateToCurrentLocation(LatLng(state.latLng.lat, state.latLng.lng))
             is MapState.AddRestaurants -> addRestaurants(state.restaurants)
             is MapState.Error -> showErrorDialog(state.exception)
+            MapState.ZoomInMore -> showZoomMoreMessage()
         }
     }
 
+    private fun showZoomMoreMessage() {
+        zoomInMoreText.visibility = View.VISIBLE
+    }
+
     private fun addRestaurants(restaurants: List<Venue>) {
+        zoomInMoreText.visibility = View.GONE
         restaurants.forEach {
             val marker = map.addMarker(
-                    MarkerOptions()
-                            .position(LatLng(it.location.lat, it.location.lng))
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                            .title(it.name)
+                MarkerOptions()
+                    .position(LatLng(it.location.lat, it.location.lng))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                    .title(it.name)
             )
             marker.tag = it.id
         }
     }
 
     private fun showErrorDialog(e: Throwable) {
+        zoomInMoreText.visibility = View.GONE
         AlertDialog.Builder(this)
-                .setTitle("Error")
-                .setCancelable(true)
-                .setMessage("Something went wrong: ${e.message}")
-                .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
-                .show()
+            .setTitle("Error")
+            .setCancelable(true)
+            .setMessage("Something went wrong: ${e.message}")
+            .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 
     private fun animateToCurrentLocation(latLng: LatLng) {
+        zoomInMoreText.visibility = View.GONE
         val cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17f)
         map.animateCamera(cameraUpdate)
         map.clear()
         map.addMarker(
-                MarkerOptions()
-                        .position(latLng)
-                        .title("You're here")
+            MarkerOptions()
+                .position(latLng)
+                .title("You're here")
         )
     }
 
@@ -110,7 +120,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
 
     private fun setupMap() {
         val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
@@ -138,16 +148,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, MapView {
         }
         mapPresenter.mapIsReady()
         map.setOnCameraIdleListener {
-            Log.i("test_", "map is idle")
-            mapPresenter.mapIsIdle(map.projection.visibleRegion.latLngBounds.toCameraBounds())
+            Log.i("test_", "map is idle zoom: ${map.cameraPosition.zoom}")
+            mapPresenter.mapIsIdle(map.projection.visibleRegion.latLngBounds.toCameraBounds(), map.cameraPosition.zoom)
         }
     }
 
     private fun LatLngBounds.toCameraBounds(): CameraBounds {
-        val northeast = com.dgimatov.foursqplacesdemo.model.LatLng(this.northeast.latitude,
-                this.northeast.longitude)
-        val southwest = com.dgimatov.foursqplacesdemo.model.LatLng(this.southwest.latitude,
-                this.southwest.longitude)
+        val northeast = com.dgimatov.foursqplacesdemo.model.LatLng(
+            this.northeast.latitude,
+            this.northeast.longitude
+        )
+        val southwest = com.dgimatov.foursqplacesdemo.model.LatLng(
+            this.southwest.latitude,
+            this.southwest.longitude
+        )
         return CameraBounds(southwest = southwest, northeast = northeast)
     }
 

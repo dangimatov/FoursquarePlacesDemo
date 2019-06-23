@@ -34,4 +34,9 @@ sealed class MapState {
      */
     data class Error(val exception: Throwable) : MapState()
 
+    /**
+     * Show that user should zoom in more
+     */
+    object ZoomInMore : MapState()
+
 }
