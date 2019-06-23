@@ -23,5 +23,5 @@ interface MapPresenter {
     /**
      * View should be managed again
      */
-    fun onStart(mapView: MapView, foursquareClientId: String, foursquareClientSecret: String)
+    fun onStart(mapView: MapView)
 }

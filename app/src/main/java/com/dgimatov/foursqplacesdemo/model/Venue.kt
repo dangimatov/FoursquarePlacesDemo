@@ -15,5 +15,6 @@ data class Venue(
 data class VenueLocation(
     val address: String?,
     val lat: Double,
-    val lng: Double
+    val lng: Double,
+    val formattedAddress: List<String>?
 )

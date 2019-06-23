@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DetailPage">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowEnterAnimation">@anim/detail_page_down</item>
+        <item name="android:windowExitAnimation">@anim/detail_page_up</item>
+    </style>
+</resources>

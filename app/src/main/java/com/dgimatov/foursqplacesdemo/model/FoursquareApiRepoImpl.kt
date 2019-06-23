@@ -16,29 +16,39 @@ class FoursquareApiRepoImpl : FoursquareApiRepo {
     private val logging = HttpLoggingInterceptor()
 
     private val httpClient = OkHttpClient.Builder()
-        .readTimeout(HTTP_READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-        .addInterceptor(logging)
-        .connectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-        .build()
+            .readTimeout(HTTP_READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .addInterceptor(logging)
+            .connectTimeout(HTTP_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .build()
 
     private val foursquareApi: FoursquareApi = Retrofit.Builder()
-        .client(httpClient)
-        .baseUrl(FOURSQUARE_HOST)
-        .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(FoursquareApi::class.java)
+            .client(httpClient)
+            .baseUrl(FOURSQUARE_HOST)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(FoursquareApi::class.java)
 
     init {
         logging.level = HttpLoggingInterceptor.Level.NONE
     }
 
     override fun getRestaurantsForLocation(
-        latLng: LatLng,
-        clientId: String,
-        clientSecret: String
-    ): Observable<FoursquareApiResponse> {
-        return foursquareApi.getRestaurantsForLocation("${latLng.lat},${latLng.lng}", clientId, clientSecret)
+            latLng: LatLng,
+            clientId: String,
+            clientSecret: String
+    ): Observable<FoursquareSearchApiResponse> {
+        return foursquareApi.getRestaurantsForLocation(
+                coordinates = "${latLng.lat},${latLng.lng}",
+                client_id = clientId,
+                client_secret = clientSecret)
+    }
+
+    override fun getRestaurantDetailInfo(id: String, clientId: String, clientSecret: String): Observable<FoursquareVenueDetailApiResponse> {
+        return foursquareApi.getVenueDetail(
+                venueId = id,
+                client_id = clientId,
+                client_secret = clientSecret)
     }
 
 

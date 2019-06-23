@@ -20,15 +20,14 @@ import io.reactivex.subjects.BehaviorSubject
 class MapInteractor(
     private val userLocationRepo: UserLocationRepo,
     private val foursquareApiRepo: FoursquareApiRepo,
+    private val foursquareClientId: String,
+    private val foursquareClientSecret: String,
     val scheduler: Scheduler
 ) : MapPresenter {
 
     private val mapIsReadySubject = BehaviorSubject.create<Unit>()
 
     private val compositeDisposable = CompositeDisposable()
-
-    private lateinit var foursquareClientId: String
-    private lateinit var foursquareClientSecret: String
 
     private lateinit var view: MapView
 
@@ -46,10 +45,8 @@ class MapInteractor(
             .onErrorReturn { MapState.Error(it) }
     }
 
-    override fun onStart(mapView: MapView, foursquareClientId: String, foursquareClientSecret: String) {
+    override fun onStart(mapView: MapView) {
         view = mapView
-        this.foursquareClientId = foursquareClientId
-        this.foursquareClientSecret = foursquareClientSecret
 
         compositeDisposable.add(
             state()

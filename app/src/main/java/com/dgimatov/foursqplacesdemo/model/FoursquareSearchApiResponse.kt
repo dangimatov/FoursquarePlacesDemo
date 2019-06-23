@@ -3,7 +3,7 @@ package com.dgimatov.foursqplacesdemo.model
 /**
  * FoursquareApi response model
  */
-data class FoursquareApiResponse(val response: VenuesWrapper)
+data class FoursquareSearchApiResponse(val response: VenuesWrapper)
 
 /**
  * Wrapper around venues list
