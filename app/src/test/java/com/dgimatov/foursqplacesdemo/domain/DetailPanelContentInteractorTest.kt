@@ -74,10 +74,11 @@ class DetailPanelContentInteractorTest {
         private val venueDetails = VenueDetails(
                 "venueId",
                 "name",
-                null,
                 VenueLocation(null, 0.0, 0.0, null),
                 "description",
-                "url"
+                "url",
+                null,
+                null
         )
         private val response = FoursquareVenueDetailApiResponse(
                 FoursquareVenueDetailsWrapper(

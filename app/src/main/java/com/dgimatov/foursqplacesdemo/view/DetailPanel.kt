@@ -53,6 +53,9 @@ class DetailPanel(context: Context) : AppCompatDialog(context), DetailView {
                     address += "\n"
                 }
                 detailPanelAddress.setTextOrHide(address)
+                detailPanelOpenHours.setTextOrHide(state.venueDetails.hours?.status)
+                detailPanelPhone.setTextOrHide(state.venueDetails.contact?.phone)
+                detailPanelWebsite.setTextOrHide(state.venueDetails.url)
                 detailsContainer.visibility = View.VISIBLE
                 detailsProgress.visibility = View.GONE
             }
@@ -67,6 +70,9 @@ class DetailPanel(context: Context) : AppCompatDialog(context), DetailView {
                     }
                     detailPanelAddress.setTextOrHide(address)
                     detailPanelDescription.setTextOrHide("Unfortunately API's daily quota was exceeded. Only basic information is available")
+                    detailPanelOpenHours.setTextOrHide(null)
+                    detailPanelPhone.setTextOrHide(null)
+                    detailPanelWebsite.setTextOrHide(null)
                     detailsContainer.visibility = View.VISIBLE
                     detailsProgress.visibility = View.GONE
                 } else {
